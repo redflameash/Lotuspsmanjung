@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lotus's Manjung Personal Shopper | Fast Local Delivery</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        lotus: {
+                            teal: '#009E91',
+                            darkTeal: '#007A70',
+                            lightTeal: '#E6F5F4',
+                            yellow: '#FFD100',
+                            amber: '#F59E0B'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Scrollbar & Smooth Transitions */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #009E91;
+        }
+        .product-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .product-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px -8px rgba(0, 158, 145, 0.18);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 font-sans text-slate-800 min-h-screen flex flex-col">
+
+    <!-- Top Local Announcement Bar -->
+    <div class="bg-lotus-darkTeal text-white text-xs sm:text-sm py-2 px-4">
+        <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-2">
+            <div class="flex items-center space-x-2">
+                <span class="bg-lotus-yellow text-slate-900 font-bold px-2 py-0.5 rounded-md text-xs">LIVE</span>
+                <span>Personal Shopper currently in-store at <strong>Lotus's Seri Manjung</strong>!</span>
+            </div>
+            <div class="flex items-center space-x-4 text-teal-100">
+                <span><i class="fa-solid fa-truck-fast mr-1"></i> Covers: Bandar Baru Setia Awan Perdana</span>
+                <span class="hidden md:inline">|</span>
+                <span class="hidden md:inline"><i class="fa-solid fa-clock mr-1"></i> Delivery Starts From Today, 9:00 PM</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Sticky Header -->
+    <header class="bg-white shadow-md sticky top-0 z-30 border-b border-slate-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            
+            <!-- TOP ROW: Prominent Logo Area & Action Controls -->
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-4 pb-4 border-b border-slate-100">
+                <!-- Logo Area -->
+                <a href="#" onclick="resetFilters(); return false;" class="flex items-center space-x-3 group text-left">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-lotus-teal to-lotus-darkTeal flex items-center justify-center text-white shadow-md group-hover:scale-105 transition">
+                        <i class="fa-solid fa-basket-shopping text-2xl"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-2xl font-extrabold tracking-tight text-lotus-teal">Lotus's <span class="text-slate-800">Manjung</span></span>
+                            <span class="bg-teal-50 text-lotus-darkTeal border border-teal-200 text-xs font-semibold px-2.5 py-0.5 rounded-full">Personal Shopper</span>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-0.5">Handpicked fresh from shelves to your doorstep in Manjung District</p>
+                    </div>
+                </a>
+
+                <!-- Delivery Zone Selector & Cart Button -->
+                <div class="flex items-center space-x-3 w-full sm:w-auto justify-end">
+                    <div class="flex items-center bg-slate-100 rounded-xl px-3 py-2 text-xs sm:text-sm border border-slate-200">
+                        <i class="fa-solid fa-location-dot text-lotus-teal mr-2"></i>
+                        <div class="flex flex-col">
+                            <span class="text-[10px] text-slate-400 font-medium uppercase leading-none">Delivering To</span>
+                            <select id="deliveryAreaSelect" onchange="updateDeliveryFee()" class="bg-transparent font-semibold text-slate-700 focus:outline-none cursor-pointer pr-1">
+                                <option value="Bandar Baru Seti Awan Perdana" data-fee="6.00">Bandar Baru Setia Awan Perdana (RM 10)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Open Custom Request Modal Button -->
+                    <button onclick="toggleCustomItemModal()" class="hidden md:flex items-center space-x-2 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 font-semibold px-3.5 py-2.5 rounded-xl text-sm transition">
+                        <i class="fa-solid fa-wand-magic-sparkles text-amber-500"></i>
+                        <span>Custom Request</span>
+                    </button>
+
+                    <!-- Cart Drawer Trigger -->
+                    <button onclick="toggleCartDrawer()" class="relative flex items-center space-x-2.5 bg-lotus-teal hover:bg-lotus-darkTeal text-white font-semibold px-4 py-2.5 rounded-xl shadow-sm transition">
+                        <i class="fa-solid fa-cart-shopping"></i>
+                        <span class="hidden sm:inline">Shopper List</span>
+                        <span id="cartCountBadge" class="bg-lotus-yellow text-slate-900 text-xs font-extrabold px-2 py-0.5 rounded-full">0</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- SECOND ROW: Directly Below Logo Area - "Search for products" & Category Dropdown Menu -->
+            <div class="pt-4 flex flex-col md:flex-row items-stretch md:items-center gap-3">
+                
+                <!-- Dropdown Menu for Categories -->
+                <div class="relative min-w-[230px]">
+                    <label for="categoryDropdown" class="sr-only">Select Category</label>
+                    <div class="relative flex items-center">
+                        <i class="fa-solid fa-layer-group absolute left-3.5 text-lotus-teal pointer-events-none"></i>
+                        <select 
+                            id="categoryDropdown" 
+                            onchange="handleCategoryChange(this.value)"
+                            aria-label="Product Categories"
+                            class="w-full appearance-none bg-lotus-lightTeal hover:bg-teal-100/80 text-lotus-darkTeal font-semibold pl-10 pr-10 py-3 rounded-xl border border-teal-300 focus:outline-none focus:ring-2 focus:ring-lotus-teal cursor-pointer text-sm transition"
+                        >
+                            <option value="All">All Categories</option>
+                            <option value="Fresh Produce">Fresh Produce</option>
+                            <option value="Baby">Baby</option>
+                            <option value="Household">Household</option>
+                            <option value="Chilled & Frozen">Chilled & Frozen</option>
+                            <option value="Grocery">Grocery</option>
+                            <option value="Beverages">Beverages</option>
+                        </select>
+                        <i class="fa-solid fa-chevron-down absolute right-3.5 text-lotus-darkTeal text-xs pointer-events-none"></i>
+                    </div>
+                </div>
+
+                <!-- Prominent "Search for products" Bar directly below logo area -->
+                <div class="relative flex-grow">
+                    <label for="productSearchInput" class="sr-only">Search for products</label>
+                    <div class="relative flex items-center">
+                        <i class="fa-solid fa-magnifying-glass absolute left-4 text-slate-400 text-base"></i>
+                        <input 
+                            type="text" 
+                            id="productSearchInput" 
+                            oninput="handleSearchInput(this.value)"
+                            placeholder="Search for products (e.g., Ayam segar, Milo, Dutch Lady, Pampers, Maggi...)" 
+                            class="w-full pl-11 pr-28 py-3 bg-slate-50 focus:bg-white rounded-xl border-2 border-slate-200 focus:border-lotus-teal focus:outline-none text-sm sm:text-base text-slate-800 placeholder-slate-400 transition"
+                        >
+                        <button 
+                            id="clearSearchBtn"
+                            onclick="clearSearch()" 
+                            class="hidden absolute right-24 text-slate-400 hover:text-slate-600 p-1"
+                            title="Clear search"
+                        >
+                            <i class="fa-solid fa-circle-xmark"></i>
+                        </button>
+                        <button 
+                            onclick="triggerSearchFocus()"
+                            class="absolute right-1.5 bg-lotus-teal hover:bg-lotus-darkTeal text-white font-semibold px-4 py-2 rounded-lg text-xs sm:text-sm transition"
+                        >
+                            Search
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Quick Visual Category Pills (Synced with Dropdown) -->
+            <div class="pt-3 flex items-center gap-2 overflow-x-auto no-scrollbar pb-1" id="categoryPillsContainer">
+                <!-- Populated dynamically via JS -->
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
+
+        <!-- Hero Personal Shopper Banner -->
+        <section class="relative rounded-3xl overflow-hidden bg-gradient-to-r from-lotus-darkTeal via-lotus-teal to-emerald-600 text-white shadow-lg">
+            <div class="p-6 sm:p-8 lg:p-10 flex flex-col lg:flex-row items-center justify-between gap-6">
+                <div class="space-y-4 max-w-2xl">
+                    <div class="inline-flex items-center space-x-2 bg-white/15 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-semibold">
+                        <i class="fa-solid fa-certificate text-lotus-yellow"></i>
+                        <span>Same Store Prices as Lotus's Seri Manjung</span>
+                    </div>
+                    <h1 class="text-2xl sm:text-4xl font-extrabold leading-tight">
+                        Skip the Queue & Traffic in Manjung. Let Us Shop For You!
+                    </h1>
+                    <p class="text-teal-50 text-sm sm:text-base leading-relaxed">
+                        Our dedicated shoppers pick the freshest vegetables, check expiry dates, and pack chilled & frozen items.
+                    </p>
+                    <div class="flex flex-wrap gap-3 pt-1">
+                        <button onclick="document.getElementById('productsSection').scrollIntoView({behavior: 'smooth'})" class="bg-lotus-yellow hover:bg-amber-400 text-slate-900 font-bold px-5 py-2.5 rounded-xl shadow transition text-sm">
+                            Browse In-Store Deals <i class="fa-solid fa-arrow-down ml-1.5"></i>
+                        </button>
+                        <button onclick="toggleCustomItemModal()" class="bg-white/15 hover:bg-white/25 text-white border border-white/30 font-semibold px-4 py-2.5 rounded-xl transition text-sm">
+                            <i class="fa-solid fa-pen-to-square mr-1.5"></i> Can't find an item? Write it in!
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Shopper Profile Card -->
+                <div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-4 sm:p-5 w-full lg:w-80 shrink-0 space-y-3">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-12 h-12 rounded-full bg-lotus-yellow text-slate-900 flex items-center justify-center font-extrabold text-lg shadow">
+                            LPS
+                        </div>
+                        <div>
+                            <div class="flex items-center space-x-1.5">
+                                <h2 class="font-bold text-white text-sm">Asher</h2>
+                                <span class="bg-emerald-400 text-slate-900 text-[10px] font-bold px-1.5 py-0.5 rounded">4.9 ★</span>
+                            </div>
+                            <p class="text-xs text-teal-100">Lead Personal Shopper • Manjung</p>
+                        </div>
+                    </div>
+                    <div class="text-xs text-teal-50 bg-black/15 rounded-xl p-3 space-y-1.5">
+                        <p><i class="fa-solid fa-check text-lotus-yellow mr-1.5"></i> Sends live WhatsApp photos for fresh fish & veggies</p>
+                        <p><i class="fa-solid fa-check text-lotus-yellow mr-1.5"></i> Receipt from Lotus's counter included</p>
+                        <p><i class="fa-solid fa-check text-lotus-yellow mr-1.5"></i> Free substitution call if out of stock</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Active Filter & Results Bar -->
+        <section id="productsSection" class="space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 rounded-2xl shadow-sm border border-slate-200/80">
+                <div class="flex items-center space-x-2">
+                    <h2 class="text-lg sm:text-xl font-bold text-slate-800" id="currentCategoryTitle">All Categories</h2>
+                    <span id="productCountBadge" class="bg-slate-100 text-slate-600 text-xs font-semibold px-2.5 py-1 rounded-full">0 items</span>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-3">
+                    <!-- Filter by Promo Toggle -->
+                    <label class="inline-flex items-center cursor-pointer bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-xl text-xs font-semibold text-amber-900">
+                        <input type="checkbox" id="promoOnlyToggle" onchange="renderProducts()" class="sr-only peer">
+                        <div class="w-8 h-4 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all relative peer-checked:bg-amber-500 mr-2"></div>
+                        <span>Lotus's Promo Only</span>
+                    </label>
+
+                    <!-- Sort Selector -->
+                    <select id="sortSelect" onchange="renderProducts()" class="bg-slate-100 text-slate-700 text-xs sm:text-sm font-medium px-3 py-2 rounded-xl border border-slate-200 focus:outline-none">
+                        <option value="featured">Sort: Featured Deals</option>
+                        <option value="price-asc">Price: Low to High</option>
+                        <option value="price-desc">Price: High to Low</option>
+                        <option value="name-asc">Name: A to Z</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Product Grid -->
+            <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+                <!-- Populated dynamically via JS -->
+            </div>
+
+            <!-- Empty State when no search matches -->
+            <div id="emptyStateContainer" class="hidden bg-white rounded-2xl p-10 text-center border border-slate-200 my-4 max-w-lg mx-auto">
+                <div class="w-16 h-16 bg-teal-50 text-lotus-teal rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-800 mb-1">Couldn't find that exact item in our quick catalog?</h3>
+                <p class="text-xs sm:text-sm text-slate-500 mb-5">
+                    Lotus's Manjung carries over 20,000 items! You can reset your search or add a custom item request directly to your personal shopper list.
+                </p>
+                <div class="flex flex-wrap justify-center gap-3">
+                    <button onclick="resetFilters()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-4 py-2.5 rounded-xl text-sm transition">
+                        Show All Products
+                    </button>
+                    <button onclick="openCustomModalWithSearchTerm()" class="bg-lotus-teal hover:bg-lotus-darkTeal text-white font-semibold px-4 py-2.5 rounded-xl text-sm transition">
+                        <i class="fa-solid fa-plus mr-1"></i> Request This Item Anyway
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- How Lotus's Manjung Personal Shopper Works -->
+        <section class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm">
+            <div class="text-center max-w-2xl mx-auto mb-6">
+                <h2 class="text-xl font-bold text-slate-800">How Our Lotus's Manjung Service Works</h2>
+                <p class="text-xs sm:text-sm text-slate-500 mt-1">Simple, transparent rates for Sitiawan, Seri Manjung, Lumut & nearby areas</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="flex items-start space-x-4 p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                    <div class="w-10 h-10 rounded-xl bg-lotus-lightTeal text-lotus-teal font-bold flex items-center justify-center shrink-0">1</div>
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-sm">Select Category & Add Notes</h3>
+                        <p class="text-xs text-slate-500 mt-1">Pick from Fresh Produce, Baby, Household, Chilled & Frozen, Grocery, or Beverages. Specify ripeness or cuts!</p>
+                    </div>
+                </div>
+                <div class="flex items-start space-x-4 p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                    <div class="w-10 h-10 rounded-xl bg-lotus-lightTeal text-lotus-teal font-bold flex items-center justify-center shrink-0">2</div>
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-sm">Live In-Store Updates</h3>
+                        <p class="text-xs text-slate-500 mt-1">Your shopper at Lotus's Seri Manjung messages you if an item is out of stock or on special clearance.</p>
+                    </div>
+                </div>
+                <div class="flex items-start space-x-4 p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                    <div class="w-10 h-10 rounded-xl bg-lotus-lightTeal text-lotus-teal font-bold flex items-center justify-center shrink-0">3</div>
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-sm">Pay Official Receipt + Runner Fee</h3>
+                        <p class="text-xs text-slate-500 mt-1">Pay via DuitNow QR or Online Transfer upon checking the official Lotus's printed receipt.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 text-xs sm:text-sm py-8 px-4 mt-12">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="w-8 h-8 rounded-lg bg-lotus-teal text-white flex items-center justify-center">
+                    <i class="fa-solid fa-basket-shopping"></i>
+                </div>
+                <div>
+                    <p class="text-white font-bold">Lotus's Manjung Personal Shopper</p>
+                    <p class="text-xs text-slate-400">Independent runner service operating at Persiaran PM 1, Pusat Bandar Seri Manjung, 32040 Perak.</p>
+                </div>
+            </div>
+            <div class="text-center sm:text-right">
+                <p>Ordering Hours: Daily 8:30 AM – 6:30 PM</p>
+                <p>Delivering Hours: Daily 9:00 PM – 10:30 PM</p>
+                <p class="text-slate-500 mt-0.5">Payment Accepted: DuitNow QR • Maybank2u • Touch 'n Go eWallet</p>
+            </div>
+        </div>
+    </footer>
+
+<!-- Slide-Over Shopping Cart & Shopper Instructions Drawer -->
+    <div id="cartDrawerBackdrop" onclick="toggleCartDrawer()" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-40 hidden transition-opacity"></div>
+    <aside id="cartDrawer" class="fixed top-0 right-0 h-full w-full sm:w-[440px] bg-white z-50 shadow-2xl transform translate-x-full transition-transform duration-300 flex flex-col">
+        <!-- Drawer Header -->
+        <div class="p-4 sm:p-5 bg-lotus-teal text-white flex items-center justify-between">
+            <div class="flex items-center space-x-2.5">
+                <i class="fa-solid fa-clipboard-list text-xl"></i>
+                <div>
+                    <h2 class="font-bold text-base">Your Personal Shopper List</h2>
+                    <p class="text-xs text-teal-100">Shopping at Lotus's Seri Manjung</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2">
+                <button id="emptyCartBtn" onclick="emptyCart()" class="hidden text-xs bg-rose-500 hover:bg-rose-600 text-white font-semibold px-2.5 py-1.5 rounded-lg transition shadow-sm" title="Empty Cart">
+                    <i class="fa-solid fa-trash-can sm:mr-1"></i> <span class="hidden sm:inline">Empty</span>
+                </button>
+                <button onclick="toggleCartDrawer()" class="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center text-white">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Cart Items Scrollable Area -->
+        <div id="cartItemsList" class="flex-grow overflow-y-auto p-4 space-y-3">
+            <!-- Populated via JS -->
+        </div>
+
+        <!-- Cart Footer / Summary & Checkout -->
+        <div class="p-4 sm:p-5 bg-slate-50 border-t border-slate-200 space-y-3">
+            <!-- Buyer Details Form -->
+            <div class="space-y-2 text-xs">
+                <div>
+                    <label class="block text-slate-500 font-medium mb-1">Your Name *</label>
+                    <input type="text" id="buyerName" placeholder="e.g. Ali bin Abu" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-2 text-slate-700 focus:outline-none focus:border-lotus-teal">
+                </div>
+                <div>
+                    <label class="block text-slate-500 font-medium mb-1">Phone Number *</label>
+                    <input type="tel" id="buyerPhone" placeholder="e.g. 012-3456789" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-2 text-slate-700 focus:outline-none focus:border-lotus-teal">
+                </div>
+                <div>
+                    <label class="block text-slate-500 font-medium mb-1">Full Delivery Address *</label>
+                    <textarea id="buyerAddress" rows="2" placeholder="e.g. No 12, Jalan 3, Taman Mewah..." class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-2 text-slate-700 focus:outline-none focus:border-lotus-teal"></textarea>
+                </div>
+            </div>
+            <!-- Delivery Slot Selection -->
+            <div class="grid grid-cols-2 gap-2 text-xs">
+                <div>
+                    <label class="block text-slate-500 font-medium mb-1">Delivery Time Slot</label>
+                    <select id="deliverySlotSelect" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-2 font-semibold text-slate-700">
+                        <option value="Today, 9:00 PM - 9:30 PM">Today, 9:00 PM</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-slate-500 font-medium mb-1">If item out of stock</label>
+                    <select id="substitutionPref" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-2 font-semibold text-slate-700">
+                        <option value="Change To Other Brand (Price May Vary)">Change Other Brand (Price may vary)</option>
+                        <option value="Cancel item">Cancel item</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Cost Breakdown -->
+            <div class="bg-white p-3 rounded-xl border border-slate-200 text-xs space-y-1.5">
+                <div class="flex justify-between text-slate-600">
+                    <span>Estimated Store Items Total:</span>
+                    <span id="subtotalDisplay" class="font-semibold">RM 0.00</span>
+                </div>
+                <div class="flex justify-between text-slate-600">
+                    <span>Personal Shopper Picking Fee:</span>
+                    <span id="serviceFeeDisplay" class="font-semibold">RM 0.00</span>
+                </div>
+                <div class="flex justify-between text-slate-600">
+                    <span>Delivery (<span id="selectedZoneLabel">Bandar Baru Setia Awan Perdana</span>):</span>
+                    <span id="deliveryFeeDisplay" class="font-semibold">RM 10.00</span>
+                </div>
+                <div class="border-t border-slate-100 pt-1.5 flex justify-between text-sm font-extrabold text-slate-900">
+                    <span>Estimated Grand Total:</span>
+                    <span id="grandTotalDisplay" class="text-lotus-teal">RM 13.00</span>
+                </div>
+            </div>
+
+            <button onclick="openOrderSummaryModal()" class="w-full bg-lotus-teal hover:bg-lotus-darkTeal text-white font-bold py-3 px-4 rounded-xl shadow flex items-center justify-center space-x-2 transition">
+                <i class="fa-brands fa-whatsapp text-lg"></i>
+                <span>Send Order to Manjung Shopper</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Custom Request Modal -->
+    <div id="customItemModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-wand-magic-sparkles text-amber-500"></i>
+                    <h3 class="font-bold text-slate-800">Add Custom Store Item</h3>
+                </div>
+                <button onclick="toggleCustomItemModal()" class="text-slate-400 hover:text-slate-600">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <p class="text-xs text-slate-500">
+                Need something specific at Lotus's Manjung not shown on our front page? Tell your personal shopper below!
+            </p>
+            <div class="space-y-3 text-sm">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Item Name & Brand *</label>
+                    <input type="text" id="customItemName" placeholder="e.g., Kicap Kipas Udang Manis 645ml" class="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 focus:outline-none focus:border-lotus-teal">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Category</label>
+                        <select id="customItemCategory" class="w-full border border-slate-200 rounded-xl px-3 py-2.5 bg-white focus:outline-none focus:border-lotus-teal">
+                            <option value="Fresh Produce">Fresh Produce</option>
+                            <option value="Baby">Baby</option>
+                            <option value="Household">Household</option>
+                            <option value="Chilled & Frozen">Chilled & Frozen</option>
+                            <option value="Grocery" selected>Grocery</option>
+                            <option value="Beverages">Beverages</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Estimated Price (RM)</label>
+                        <input type="number" id="customItemPrice" value="10.00" min="1" step="0.50" class="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 focus:outline-none focus:border-lotus-teal">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Special Instructions for Shopper</label>
+                    <input type="text" id="customItemNotes" placeholder="e.g., Grab 2 bottles if on promotion" class="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 focus:outline-none focus:border-lotus-teal">
+                </div>
+            </div>
+            <div class="flex justify-end space-x-2 pt-2">
+                <button onclick="toggleCustomItemModal()" class="px-4 py-2 rounded-xl bg-slate-100 text-slate-600 text-sm font-semibold">Cancel</button>
+                <button onclick="addCustomItemToCart()" class="px-5 py-2 rounded-xl bg-lotus-teal hover:bg-lotus-darkTeal text-white text-sm font-bold">Add to Shopper List</button>
+            </div>
+        </div>
+    </div>
+
+<!-- Order Preview / WhatsApp Dispatch Modal -->
+    <div id="orderModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <div class="flex items-center space-x-2 text-lotus-teal">
+                    <i class="fa-brands fa-whatsapp text-2xl"></i>
+                    <h3 class="font-bold text-slate-800 text-lg">Ready to Send to Your Shopper</h3>
+                </div>
+                <button onclick="closeOrderModal()" class="text-slate-400 hover:text-slate-600">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            
+            <!-- MISSING PREVIEW BLOCK ADDED HERE -->
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs space-y-1">
+                <p><span class="text-slate-500 font-semibold">Name:</span> <span id="previewBuyerName" class="font-bold text-slate-800"></span></p>
+                <p><span class="text-slate-500 font-semibold">Phone:</span> <span id="previewBuyerPhone" class="font-bold text-slate-800"></span></p>
+                <p><span class="text-slate-500 font-semibold">Address:</span> <span id="previewBuyerAddress" class="font-bold text-slate-800"></span></p>
+            </div>
+
+            <p class="text-xs text-slate-500">
+                Review or copy your formatted order summary for <strong>Lotus's Seri Manjung</strong> below:
+            </p>
+            <textarea id="orderSummaryText" rows="7" readonly class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-mono text-slate-700 focus:outline-none"></textarea>
+            
+            <div class="flex flex-wrap justify-between items-center gap-2 pt-1">
+                <button onclick="copyOrderSummary()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold py-2.5 px-4 rounded-xl text-xs sm:text-sm transition">
+                    <i class="fa-regular fa-copy mr-1.5"></i> Copy Order Text
+                </button>
+                <button onclick="sendToWhatsApp()" class="flex-1 bg-lotus-teal hover:bg-lotus-darkTeal text-white font-bold py-2.5 px-4 rounded-xl text-xs sm:text-sm transition">
+                <i class="fa-brands fa-whatsapp text-lg"></i>
+                <span>Send Order Now!</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Toast Notification -->
+    <div id="toastNotification" class="fixed bottom-5 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-5 py-3 rounded-2xl shadow-xl text-xs sm:text-sm font-medium flex items-center space-x-2.5 z-50 opacity-0 pointer-events-none transition-opacity duration-300">
+        <i class="fa-solid fa-circle-check text-emerald-400"></i>
+        <span id="toastMessage">Added to shopper list!</span>
+    </div>
+
+    <!-- Application Logic -->
+    <script>
+        // Exact required categories
+        const CATEGORIES = [
+            "All",
+            "Fresh Produce",
+            "Baby",
+            "Household",
+            "Chilled & Frozen",
+            "Grocery",
+            "Beverages"
+        ];
+
+        const CATEGORY_ICONS = {
+            "All": "fa-border-all",
+            "Fresh Produce": "fa-carrot",
+            "Baby": "fa-baby-carriage",
+            "Household": "fa-Spray-can-sparkles",
+            "Chilled & Frozen": "fa-snowflake",
+            "Grocery": "fa-jar",
+            "Beverages": "fa-mug-hot"
+        };
+
+        // Authentic Lotus's Malaysia Product Catalog
+// 1. Create an empty array that will be filled by the Google Sheet
+        let PRODUCTS = []; 
+
+        // 2. Fetch data from Google Sheets
+        async function loadProductsFromGoogleSheets() {
+            // PASTE YOUR PUBLISHED CSV LINK BETWEEN THE QUOTES BELOW:
+            const csvUrl = "PASTE_YOUR_CSV_LINK_HERE";
+            
+            try {
+                const response = await fetch(csvUrl);
+                const csvText = await response.text();
+                
+                // Read the lines of the file
+                const rows = csvText.split('\n');
+                
+                // Loop through rows (skipping the first row which is headers)
+                for (let i = 1; i < rows.length; i++) {
+                    if (!rows[i].trim()) continue; 
+                    
+                    // Split the row by commas (ignoring commas inside quotes)
+                    const cols = rows[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(col => col.replace(/^"|"$/g, '').trim());
+                    
+                    PRODUCTS.push({
+                        id: parseInt(cols[0]),
+                        name: cols[1],
+                        category: cols[2],
+                        price: parseFloat(cols[3]),
+                        oldPrice: cols[4] ? parseFloat(cols[4]) : null,
+                        unit: cols[5],
+                        promo: cols[6].toUpperCase() === 'TRUE',
+                        badge: cols[7],
+                        image: cols[8],
+                        defaultHint: cols[9] || "Note for shopper (optional)"
+                    });
+                }
+                
+                // Tell the website to draw the products on the screen now that we have the data
+                renderCategoryPills();
+                renderProducts();
+            } catch (error) {
+                console.error("Error loading products:", error);
+                alert("Could not load product prices. Please check your internet connection.");
+            }
+        };
+
+        // Application State
+        let selectedCategory = "All";
+        let searchQuery = "";
+        let cart = [];
+
+        // Initialize Page
+        window.onload = function () {
+            loadProductsFromGoogleSheets(); // This fetches the sheet data first
+            renderCart();
+        };
+
+        // Render Category Quick Pills
+        function renderCategoryPills() {
+            const container = document.getElementById("categoryPillsContainer");
+            container.innerHTML = CATEGORIES.map(cat => {
+                const isActive = selectedCategory === cat;
+                const activeClasses = isActive
+                    ? "bg-lotus-teal text-white shadow-sm"
+                    : "bg-slate-100 hover:bg-slate-200 text-slate-600";
+                return `
+                    <button 
+                        onclick="handleCategoryChange('${cat}')"
+                        class="flex items-center space-x-2 px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition ${activeClasses}"
+                    >
+                        <i class="fa-solid ${CATEGORY_ICONS[cat] || 'fa-tag'}"></i>
+                        <span>${cat}</span>
+                    </button>
+                `;
+            }).join("");
+        }
+        
+
+        // Handle Dropdown or Pill Category Selection
+        function handleCategoryChange(category) {
+            selectedCategory = category;
+            const dropdown = document.getElementById("categoryDropdown");
+            if (dropdown.value !== category) {
+                dropdown.value = category;
+            }
+            renderCategoryPills();
+            renderProducts();
+        }
+
+        // Handle Search Input
+        function handleSearchInput(val) {
+            searchQuery = val.trim();
+            const clearBtn = document.getElementById("clearSearchBtn");
+            if (searchQuery.length > 0) {
+                clearBtn.classList.remove("hidden");
+            } else {
+                clearBtn.classList.add("hidden");
+            }
+            renderProducts();
+        }
+
+        function clearSearch() {
+            const input = document.getElementById("productSearchInput");
+            input.value = "";
+            handleSearchInput("");
+            input.focus();
+        }
+
+        function triggerSearchFocus() {
+            const input = document.getElementById("productSearchInput");
+            if (!input.value.trim()) {
+                input.focus();
+            } else {
+                document.getElementById("productsSection").scrollIntoView({ behavior: "smooth" });
+            }
+        }
+
+        function resetFilters() {
+            selectedCategory = "All";
+            searchQuery = "";
+            document.getElementById("categoryDropdown").value = "All";
+            document.getElementById("productSearchInput").value = "";
+            document.getElementById("clearSearchBtn").classList.add("hidden");
+            document.getElementById("promoOnlyToggle").checked = false;
+            renderCategoryPills();
+            renderProducts();
+        }
+
+        // Render Product Cards
+        function renderProducts() {
+            const grid = document.getElementById("productGrid");
+            const emptyState = document.getElementById("emptyStateContainer");
+            const titleEl = document.getElementById("currentCategoryTitle");
+            const countBadge = document.getElementById("productCountBadge");
+            const promoOnly = document.getElementById("promoOnlyToggle").checked;
+            const sortBy = document.getElementById("sortSelect").value;
+
+            // Filter products
+            let filtered = PRODUCTS.filter(item => {
+                const matchesCategory = selectedCategory === "All" || item.category === selectedCategory;
+                const matchesSearch = searchQuery === "" ||
+                    item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    item.category.toLowerCase().includes(searchQuery.toLowerCase());
+                const matchesPromo = !promoOnly || item.promo;
+                return matchesCategory && matchesSearch && matchesPromo;
+            });
+
+            // Sort products
+            if (sortBy === "price-asc") {
+                filtered.sort((a, b) => a.price - b.price);
+            } else if (sortBy === "price-desc") {
+                filtered.sort((a, b) => b.price - a.price);
+            } else if (sortBy === "name-asc") {
+                filtered.sort((a, b) => a.name.localeCompare(b.name));
+            }
+
+            // Update Heading
+            titleEl.textContent = searchQuery
+                ? `${selectedCategory} — Search: "${searchQuery}"`
+                : selectedCategory;
+            countBadge.textContent = `${filtered.length} item${filtered.length === 1 ? "" : "s"}`;
+
+            if (filtered.length === 0) {
+                grid.innerHTML = "";
+                emptyState.classList.remove("hidden");
+                return;
+            }
+
+            emptyState.classList.add("hidden");
+
+            grid.innerHTML = filtered.map(product => {
+                const inCart = cart.find(c => c.id === product.id);
+                return `
+                    <div class="product-card bg-white rounded-2xl border border-slate-200/90 p-4 flex flex-col justify-between relative overflow-hidden">
+                        <!-- Top Badges -->
+                        <div>
+                            <div class="flex justify-between items-start mb-3">
+                                <span class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600">
+                                    ${product.category}
+                                </span>
+                                ${product.promo ? `
+                                    <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-lotus-yellow text-slate-900">
+                                        ${product.badge}
+                                    </span>
+                                ` : `
+                                    <span class="text-[11px] font-medium px-2 py-0.5 rounded-full bg-teal-50 text-lotus-darkTeal">
+                                        ${product.badge}
+                                    </span>
+                                `}
+                            </div>
+
+                           <!-- Image Graphic Area -->
+                            <div class="w-full h-32 mb-3 relative rounded-xl overflow-hidden bg-slate-100 flex items-center justify-center border border-slate-200/60">
+                                <img src="${product.image}" alt="${product.name}" class="w-full h-full object-cover transition-transform duration-300 hover:scale-105">
+                                
+                                <!-- Floating Unit Badge -->
+                                <div class="absolute bottom-2 left-2 bg-white/90 backdrop-blur-sm text-[10px] font-bold px-2 py-1 rounded-lg shadow-sm text-slate-700">
+                                    ${product.unit}
+                                </div>
+                            </div>
+
+                            <!-- Title -->
+                            <h3 class="font-bold text-slate-800 text-sm leading-snug line-clamp-2 min-h-[40px]">
+                                ${product.name}
+                            </h3>
+
+                            <!-- Price Row -->
+                            <div class="mt-2 flex items-baseline space-x-2">
+                                <span class="text-lg font-extrabold text-lotus-teal">RM ${product.price.toFixed(2)}</span>
+                                ${product.oldPrice ? `
+                                    <span class="text-xs text-slate-400 line-through">RM ${product.oldPrice.toFixed(2)}</span>
+                                ` : ""}
+                            </div>
+                        </div>
+
+                        <!-- Personal Shopper Note Input & Add Button -->
+                        <div class="mt-3 pt-3 border-t border-slate-100 space-y-2">
+                            <input 
+                                type="text" 
+                                id="note-input-${product.id}"
+                                value="${inCart ? inCart.shopperNote : ''}"
+                                placeholder="${product.defaultHint || 'Note for shopper (optional)'}"
+                                class="w-full text-xs bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-slate-700 placeholder-slate-400 focus:outline-none focus:border-lotus-teal"
+                            >
+                            <button 
+                                onclick="addToCart(${product.id})"
+                                class="w-full py-2 px-3 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center space-x-1.5 transition ${
+                                    inCart 
+                                    ? 'bg-emerald-600 hover:bg-emerald-700 text-white' 
+                                    : 'bg-lotus-lightTeal hover:bg-lotus-teal text-lotus-darkTeal hover:text-white'
+                                }"
+                            >
+                                <i class="fa-solid ${inCart ? 'fa-check' : 'fa-plus'}"></i>
+                                <span>${inCart ? `In List (${inCart.quantity}) • Add More` : 'Add to Shopper List'}</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join("");
+        }
+
+        // Add Item to Cart
+        function addToCart(productId) {
+            const product = PRODUCTS.find(p => p.id === productId);
+            if (!product) return;
+
+            const noteEl = document.getElementById(`note-input-${productId}`);
+            const noteText = noteEl ? noteEl.value.trim() : "";
+
+            const existing = cart.find(item => item.id === productId);
+            if (existing) {
+                existing.quantity += 1;
+                if (noteText) existing.shopperNote = noteText;
+            } else {
+                cart.push({
+                    ...product,
+                    quantity: 1,
+                    shopperNote: noteText
+                });
+            }
+
+            renderProducts();
+            renderCart();
+            showToast(`Added "${product.name}" to your shopper list!`);
+        }
+
+        // Update Cart Item Quantity
+        function updateCartQty(productId, delta) {
+            const idx = cart.findIndex(item => item.id === productId);
+            if (idx === -1) return;
+
+            cart[idx].quantity += delta;
+            if (cart[idx].quantity <= 0) {
+                cart.splice(idx, 1);
+            }
+            renderProducts();
+            renderCart();
+        }
+
+        // Update Shopper Note inside Drawer
+        function updateCartNote(productId, value) {
+            const item = cart.find(c => c.id === productId);
+            if (item) {
+                item.shopperNote = value;
+            }
+        }
+
+        // Render Cart Drawer
+        function renderCart() {
+            const listEl = document.getElementById("cartItemsList");
+            const badgeEl = document.getElementById("cartCountBadge");
+            const totalCount = cart.reduce((acc, item) => acc + item.quantity, 0);
+            badgeEl.textContent = totalCount;
+
+            if (cart.length === 0) {
+                listEl.innerHTML = `
+                    <div class="text-center py-12 px-4">
+                        <div class="w-14 h-14 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center mx-auto mb-3 text-xl">
+                            <i class="fa-solid fa-basket-shopping"></i>
+                        </div>
+                        <p class="font-bold text-slate-700 text-sm">Your personal shopper list is empty</p>
+                        <p class="text-xs text-slate-400 mt-1">Browse items or add a custom request for Lotus's Manjung.</p>
+                    </div>
+                `;
+            } else {
+                listEl.innerHTML = cart.map(item => `
+                    <div class="bg-slate-50 rounded-xl p-3 border border-slate-200/80 space-y-2">
+                        <div class="flex justify-between items-start gap-2">
+                            <div>
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-lotus-teal">${item.category}</span>
+                                <h4 class="font-bold text-slate-800 text-xs sm:text-sm leading-snug">${item.name}</h4>
+                                <p class="text-xs font-semibold text-slate-500">RM ${item.price.toFixed(2)} × ${item.quantity} = <span class="text-slate-800 font-bold">RM ${(item.price * item.quantity).toFixed(2)}</span></p>
+                            </div>
+                            <div class="flex items-center space-x-1.5 bg-white border border-slate-200 rounded-lg px-1.5 py-1 shrink-0">
+                                <button onclick="updateCartQty(${item.id}, -1)" class="w-6 h-6 rounded hover:bg-slate-100 text-slate-600 font-bold text-xs">-</button>
+                                <span class="text-xs font-bold px-1">${item.quantity}</span>
+                                <button onclick="updateCartQty(${item.id}, 1)" class="w-6 h-6 rounded hover:bg-slate-100 text-lotus-teal font-bold text-xs">+</button>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-1.5 bg-white rounded-lg px-2.5 py-1.5 border border-slate-200">
+                            <i class="fa-regular fa-comment-dots text-lotus-teal text-xs"></i>
+                            <input 
+                                type="text" 
+                                value="${item.shopperNote || ''}"
+                                oninput="updateCartNote(${item.id}, this.value)"
+                                placeholder="Add picking instruction for shopper..."
+                                class="w-full text-xs text-slate-700 focus:outline-none"
+                            >
+                        </div>
+                    </div>
+                `).join("");
+            }
+
+            updateTotals();
+        }
+
+        function updateDeliveryFee() {
+            updateTotals();
+        }
+
+        function updateTotals() {
+            const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+            const serviceFee = cart.length > 0 ? 4.00 : 0.00;
+            const areaSelect = document.getElementById("deliveryAreaSelect");
+            const selectedOption = areaSelect.options[areaSelect.selectedIndex];
+            const deliveryFee = parseFloat(selectedOption.getAttribute("data-fee") || "8.00");
+            const grandTotal = subtotal + serviceFee + (cart.length > 0 ? deliveryFee : 0);
+
+            document.getElementById("subtotalDisplay").textContent = `RM ${subtotal.toFixed(2)}`;
+            document.getElementById("serviceFeeDisplay").textContent = `RM ${serviceFee.toFixed(2)}`;
+            document.getElementById("selectedZoneLabel").textContent = areaSelect.value;
+            document.getElementById("deliveryFeeDisplay").textContent = `RM ${(cart.length > 0 ? deliveryFee : 0).toFixed(2)}`;
+            document.getElementById("grandTotalDisplay").textContent = `RM ${grandTotal.toFixed(2)}`;
+        }
+
+        // Toggle Cart Drawer
+        function toggleCartDrawer() {
+            const drawer = document.getElementById("cartDrawer");
+            const backdrop = document.getElementById("cartDrawerBackdrop");
+            const isClosed = drawer.classList.contains("translate-x-full");
+
+            if (isClosed) {
+                drawer.classList.remove("translate-x-full");
+                backdrop.classList.remove("hidden");
+            } else {
+                drawer.classList.add("translate-x-full");
+                backdrop.classList.add("hidden");
+            }
+        }
+
+        // Custom Item Request Modal
+        function toggleCustomItemModal() {
+            const modal = document.getElementById("customItemModal");
+            if (modal.classList.contains("hidden")) {
+                modal.classList.remove("hidden");
+                modal.classList.add("flex");
+            } else {
+                modal.classList.add("hidden");
+                modal.classList.remove("flex");
+            }
+        }
+
+        function openCustomModalWithSearchTerm() {
+            const term = document.getElementById("productSearchInput").value.trim();
+            document.getElementById("customItemName").value = term;
+            if (selectedCategory !== "All") {
+                document.getElementById("customItemCategory").value = selectedCategory;
+            }
+            toggleCustomItemModal();
+        }
+
+        function addCustomItemToCart() {
+            const nameInput = document.getElementById("customItemName");
+            const categoryInput = document.getElementById("customItemCategory");
+            const priceInput = document.getElementById("customItemPrice");
+            const notesInput = document.getElementById("customItemNotes");
+
+            const name = nameInput.value.trim();
+            if (!name) {
+                showToast("Please enter the item name first.");
+                return;
+            }
+
+            const estPrice = parseFloat(priceInput.value) || 10.00;
+            const customProduct = {
+                id: Date.now(),
+                name: `[Custom Request] ${name}`,
+                category: categoryInput.value,
+                price: estPrice,
+                quantity: 1,
+                shopperNote: notesInput.value.trim() || "Customer custom request"
+            };
+
+            cart.push(customProduct);
+            nameInput.value = "";
+            notesInput.value = "";
+            toggleCustomItemModal();
+            renderCart();
+            showToast(`Added custom request "${name}" to shopper list!`);
+        }
+
+        // Order Summary Modal
+        function openOrderSummaryModal() {
+            if (cart.length === 0) {
+                showToast("Please add at least 1 item to your shopper list first!");
+                return;
+            }
+            const buyerName = document.getElementById("buyerName").value.trim();
+            const buyerPhone = document.getElementById("buyerPhone").value.trim();
+            const buyerAddress = document.getElementById("buyerAddress").value.trim();
+
+            if (!buyerName || !buyerPhone || !buyerAddress) {
+                showToast("Please fill in your Name, Phone, and Delivery Address.");
+                return;
+            }
+
+            // Populate Modal Preview Fields
+            document.getElementById("previewBuyerName").textContent = buyerName;
+            document.getElementById("previewBuyerPhone").textContent = buyerPhone;
+            document.getElementById("previewBuyerAddress").textContent = buyerAddress;
+
+            const zone = document.getElementById("deliveryAreaSelect").value;
+            const slot = document.getElementById("deliverySlotSelect").value;
+            const subPref = document.getElementById("substitutionPref").value;
+            const grandTotal = document.getElementById("grandTotalDisplay").textContent;
+
+            // Generate a random 4-digit order number with a prefix
+            const orderNumber = "LPS-" + Math.floor(1000 + Math.random() * 9000);
+
+            let lines = [
+                " *LOTUS'S MANJUNG PERSONAL SHOPPER ORDER*",
+                ` Name: ${buyerName}`,
+                ` Phone: ${buyerPhone}`,
+                ` Address: ${buyerAddress}`,
+                "-----------------------------------------",
+                ` Delivery Area: ${zone}`,
+                ` Preferred Slot: ${slot}`,
+                ` Substitution Rule: ${subPref}`,
+                "-----------------------------------------",
+
+                "*ITEMS:*"
+            ];
+
+            cart.forEach((item, index) => {
+                lines.push(`${index + 1}. ${item.name} (x${item.quantity}) - Est. RM ${(item.price * item.quantity).toFixed(2)}`);
+                if (item.shopperNote) {
+                    lines.push(`   ↳ Note: "${item.shopperNote}"`);
+                }
+            });
+
+            lines.push("-----------------------------------------");
+            lines.push(`*ESTIMATED TOTAL (incl. Runner RM 4 & Delivery RM 6): ${grandTotal}*`);
+            lines.push("Your order will be processed once your payment has been received. Thank you!");
+
+            document.getElementById("orderSummaryText").value = lines.join("\n");
+
+            const modal = document.getElementById("orderModal");
+            modal.classList.remove("hidden");
+            modal.classList.add("flex");
+        }
+
+        function closeOrderModal() {
+            const modal = document.getElementById("orderModal");
+            modal.classList.add("hidden");
+            modal.classList.remove("flex");
+        }
+
+        function copyOrderSummary() {
+            const textarea = document.getElementById("orderSummaryText");
+            textarea.select();
+            document.execCommand("copy");
+            showToast("Order summary copied! Ready to paste into WhatsApp.");
+        }
+
+        // Toast Helper
+        let toastTimeout;
+        function showToast(message) {
+            const toast = document.getElementById("toastNotification");
+            document.getElementById("toastMessage").textContent = message;
+            toast.classList.remove("opacity-0");
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.add("opacity-0");
+            }, 2600);
+        }
+function sendToWhatsApp() {
+    const orderText = document.getElementById("orderSummaryText").value;
+    const phoneNumber = "60123456789"; // Your number
+    
+    // THIS LINE IS CRITICAL FOR EMOJIS:
+    const encodedText = encodeURIComponent(orderText); 
+    
+    const whatsappUrl = `https://wa.me/${60103039471}?text=${encodedText}`;
+    window.open(whatsappUrl, '_blank');
+}
+    </script>
+</body>
+</html>
